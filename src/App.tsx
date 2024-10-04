@@ -1,43 +1,19 @@
-import { Routes, Route, useNavigate } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import Home from './pages/Home';
 import AuthLogin from './pages/AuthLogin';
 import AuthRegister from './pages/AuthRegister';
 import UserPage from './pages/UserPage';
 import Header from './components/Header';
-import { useAuth } from './hooks/useAuth';
-import { useEffect, useState } from 'react';
-import { useAppDispatch } from './hooks/redux-hooks';
-import { setUser } from './store/slices/userSlice';
 import Error from './pages/Error';
+import useLocalStorageAuth from './hooks/useLocalStorageAuth';
 import LoadingSpinner from './components/Spinner';
+import { useAuth } from './hooks/useAuth';
 
 function App() {
-    const dispatch = useAppDispatch();
-    const navigate = useNavigate();
     const { isAuth } = useAuth();
+    const loadingLocalStorage = useLocalStorageAuth(isAuth);
 
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        const storedUser = localStorage.getItem('user');
-
-        if (storedUser) {
-            const user = JSON.parse(storedUser);
-            dispatch(setUser(user));
-        }
-
-        setLoading(false);
-    }, [dispatch]);
-
-    useEffect(() => {
-        if (!loading) {
-            if (!isAuth) {
-                navigate('/login');
-            }
-        }
-    }, [isAuth, loading]);
-
-    if (loading) {
+    if (loadingLocalStorage) {
         return <LoadingSpinner />;
     }
 
