@@ -9,6 +9,7 @@ import { useEffect, useState } from 'react';
 import { useAppDispatch } from './hooks/redux-hooks';
 import { setUser } from './store/slices/userSlice';
 import Error from './pages/Error';
+import LoadingSpinner from './components/Spinner';
 
 function App() {
     const dispatch = useAppDispatch();
@@ -29,10 +30,16 @@ function App() {
     }, [dispatch]);
 
     useEffect(() => {
-        if (!loading && !isAuth) {
-            navigate('/login');
+        if (!loading) {
+            if (!isAuth) {
+                navigate('/login');
+            }
         }
-    }, [isAuth]);
+    }, [isAuth, loading]);
+
+    if (loading) {
+        return <LoadingSpinner />;
+    }
 
     return (
         <>
