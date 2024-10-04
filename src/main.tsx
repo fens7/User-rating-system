@@ -8,6 +8,8 @@ import { Provider } from 'react-redux';
 import { store } from './store/store.ts';
 import './firebase.ts';
 
+console.log('Rendering App...');
+
 ReactDOM.createRoot(document.getElementById('root')!).render(
     <ChakraProvider theme={theme}>
         <BrowserRouter>
