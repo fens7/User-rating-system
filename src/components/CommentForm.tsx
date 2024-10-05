@@ -4,7 +4,7 @@ import { CommentSectionProps } from './CommentSection';
 import { getDatabase, push, ref, set } from 'firebase/database';
 import Stars from './Stars';
 
-function CommentForm({ userId, currentUserId, currentUserName }: CommentSectionProps) {
+function CommentForm({ userId, profileUser, authUser }: CommentSectionProps) {
     const [commentText, setCommentText] = useState('');
     const [rating, setRating] = useState(0);
 
@@ -17,8 +17,8 @@ function CommentForm({ userId, currentUserId, currentUserName }: CommentSectionP
             await set(newCommentRef, {
                 text: commentText.trim(),
                 createdAt: new Date().toISOString(),
-                authorId: currentUserId,
-                authorName: currentUserName,
+                authorId: authUser?.id,
+                authorName: authUser?.firstName,
                 rating: rating,
             });
 
@@ -27,7 +27,7 @@ function CommentForm({ userId, currentUserId, currentUserName }: CommentSectionP
         }
     }
 
-    if (userId === currentUserId) {
+    if (userId === authUser?.id) {
         return null;
     }
 
@@ -35,7 +35,7 @@ function CommentForm({ userId, currentUserId, currentUserName }: CommentSectionP
         <Box my={4}>
             <VStack spacing={3} align="start">
                 <HStack align="start" spacing={3} width="100%">
-                    <Avatar name={currentUserName || ''} />
+                    <Avatar name={authUser?.firstName || ''} />
                     <Textarea
                         placeholder="Write a message..."
                         value={commentText}
@@ -48,7 +48,7 @@ function CommentForm({ userId, currentUserId, currentUserName }: CommentSectionP
 
                 <HStack spacing={1}>
                     <Text fontSize="sm" fontWeight="bold">
-                        Rating:
+                        Rate {profileUser?.firstName}:
                     </Text>
 
                     <Stars
@@ -61,8 +61,10 @@ function CommentForm({ userId, currentUserId, currentUserName }: CommentSectionP
 
                 <Button
                     onClick={handleCommentSubmit}
-                    bg="#e02bd5"
-                    isDisabled={!commentText.trim() || rating === 0}>
+                    bg="brand.200"
+                    isDisabled={
+                        !commentText.trim() || rating === 0 || commentText.length <= 3
+                    }>
                     Submit
                 </Button>
             </VStack>

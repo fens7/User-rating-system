@@ -1,13 +1,14 @@
-import { Text, VStack } from '@chakra-ui/react';
+import { Box, Text, VStack } from '@chakra-ui/react';
 import { getDatabase, onValue, ref, remove } from 'firebase/database';
 import { useEffect, useState } from 'react';
 import CommentForm from './CommentForm';
 import CommentCard from './CommentCard';
+import { User } from '../store/slices/userSlice';
 
 export type CommentSectionProps = {
     userId: string | undefined;
-    currentUserId: string | null;
-    currentUserName: string | null;
+    profileUser: User | null;
+    authUser: User | null;
 };
 
 export interface Comment {
@@ -19,7 +20,7 @@ export interface Comment {
     rating: number;
 }
 
-function CommentSection({ userId, currentUserId, currentUserName }: CommentSectionProps) {
+function CommentSection({ authUser, profileUser, userId }: CommentSectionProps) {
     const [comments, setComments] = useState<Comment[]>([]);
     const [canSubmitComment, setCanSubmitComment] = useState<boolean>(true);
 
@@ -38,27 +39,36 @@ function CommentSection({ userId, currentUserId, currentUserName }: CommentSecti
             setComments(commentsArray);
 
             const hasUserCommented = commentsArray.some(
-                (comment) => comment.authorId === currentUserId,
+                (comment) => comment.authorId === authUser?.id,
             );
 
             setCanSubmitComment(!hasUserCommented);
         });
     }, [userId]);
 
-    function handleDeleteComment(id: string) {
+    function handleDeleteComment(id: string | undefined) {
         const db = getDatabase();
         const commentRef = ref(db, `users/${userId}/comments/${id}`);
         remove(commentRef);
     }
 
+    console.log('profileUser', profileUser);
+    console.log('authUser', authUser);
+
     return (
         <>
-            {canSubmitComment && (
+            {canSubmitComment ? (
                 <CommentForm
-                    currentUserName={currentUserName}
+                    authUser={authUser}
+                    profileUser={profileUser}
                     userId={userId}
-                    currentUserId={currentUserId}
                 />
+            ) : (
+                <Box textAlign={'center'}>
+                    <Text color={'brand.100'} fontSize={20} as={'h1'}>
+                        You have already rated this user.
+                    </Text>
+                </Box>
             )}
 
             <Text fontWeight="bold" fontSize="lg" mt={8} mb={5}>

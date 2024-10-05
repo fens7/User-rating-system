@@ -16,12 +16,16 @@ function Header() {
             <Flex justify="space-evenly" align="center" padding="12px" bg="brand.400">
                 <IconButton
                     icon={<AiOutlineHome />}
+                    bg="none"
                     aria-label="Home"
-                    variant="ghost"
                     fontSize="30px"
                     size="sm"
                     color="brand.500"
                     cursor="pointer"
+                    _hover={{
+                        background: 'none',
+                        color: 'brand.200',
+                    }}
                     onClick={() => navigate('/')}
                 />
 

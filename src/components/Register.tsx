@@ -4,10 +4,13 @@ import Form, { FormData } from './Form';
 import { useNavigate } from 'react-router-dom';
 import { setUser } from '../store/slices/userSlice';
 import { useAppDispatch } from '../hooks/redux-hooks';
+import { ServerError } from './Login';
+import { useToast } from '@chakra-ui/react';
 
 function Register() {
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
+    const toast = useToast();
 
     function capitalizeFirstLetter(str?: string) {
         if (!str) return '';
@@ -50,8 +53,31 @@ function Register() {
             );
 
             navigate('/');
-        } catch (error) {
-            console.error('Error during registration:', error);
+        } catch (err: unknown) {
+            const serverError = err as ServerError;
+
+            if (serverError.message === 'Firebase: Error (auth/email-already-in-use).') {
+                toast({
+                    title: 'User with that email address already exists',
+                    description: 'Try again.',
+                    status: 'error',
+                    duration: 4000,
+                    isClosable: false,
+                    position: 'top',
+                });
+            } else if (
+                serverError.message ===
+                'Firebase: Access to this account has been temporarily disabled due to many failed login attempts. You can immediately restore it by resetting your password or you can try again later. (auth/too-many-requests).'
+            ) {
+                toast({
+                    title: 'Too many requests.',
+                    description: 'Try again later.',
+                    status: 'error',
+                    duration: 4000,
+                    isClosable: false,
+                    position: 'top',
+                });
+            }
         }
     }
 

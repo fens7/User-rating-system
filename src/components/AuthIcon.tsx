@@ -15,26 +15,27 @@ import { useAuth } from '../hooks/useAuth';
 
 function AuthIcon() {
     const [isLogged, setLogged] = useState(false);
-    const { id, firstName, lastName } = useAuth();
-    const fullNameHi = `Hey, ${firstName} ${lastName}!`;
+    const { id } = useAuth();
 
     const dispatch = useAppDispatch();
 
     return (
-        <Menu isOpen={isLogged} onClose={() => setLogged(false)}>
+        <Menu  isOpen={isLogged} onClose={() => setLogged(false)}>
             <MenuButton
                 as={IconButton}
                 icon={<FiUser />}
                 aria-label="Menu"
-                variant="ghost"
                 fontSize="30px"
                 size="sm"
+                bg={'none'}
                 color="brand.500"
                 cursor="pointer"
+                _active={{ bg: 'none' }}
+                _hover={{ color: 'brand.200' }}
                 onClick={() => setLogged(!isLogged)}
             />
             <MenuList bg="brand.300">
-                <MenuGroup color="color.50" title={fullNameHi || ''}>
+                <MenuGroup>
                     <MenuItem
                         _hover={{ bg: 'brand.200' }}
                         bg="brand.300"

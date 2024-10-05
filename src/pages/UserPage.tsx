@@ -16,10 +16,10 @@ function UserPage() {
     const [isLoading, setLoading] = useState(true);
 
     const { id } = useParams();
-    const [currentUser, setCurrentUser] = useState<User | null>(null);
+    const [profileUser, setProfileUser] = useState<User | null>(null);
     const [averageRating, setAverageRating] = useState<number>(0);
     const [usersRated, setUsersRated] = useState<number>(0);
-    const user = useAuth();
+    const authUser = useAuth();
 
     useEffect(() => {
         const db = getDatabase();
@@ -28,7 +28,7 @@ function UserPage() {
         onValue(userRef, async (snapshot) => {
             const data = snapshot.val();
             if (data) {
-                setCurrentUser(data);
+                setProfileUser(data);
                 const rating = calculateAverageRating(data.comments);
 
                 setAverageRating(rating);
@@ -68,27 +68,23 @@ function UserPage() {
             shadow="md"
             borderRadius="lg">
             <VStack align="center" mb={5}>
-                <Avatar size="xl" name={currentUser?.firstName || ''} />
+                <Avatar size="xl" name={profileUser?.firstName || ''} />
                 <Text fontSize="2xl" fontWeight="bold">
-                    {currentUser?.firstName} {currentUser?.lastName}
+                    {profileUser?.firstName} {profileUser?.lastName}
                 </Text>
-                <Text fontSize="md">{currentUser?.email}</Text>
+                <Text fontSize="md">{profileUser?.email}</Text>
 
                 <HStack spacing={1}>
                     <StarRating
-                        userId={user.id}
-                        ratedUserId={currentUser?.id}
+                        userId={id}
+                        ratedUserId={profileUser?.id}
                         rating={averageRating}
                         usersRated={usersRated}
                     />
                 </HStack>
             </VStack>
 
-            <CommentSection
-                currentUserName={user?.firstName}
-                currentUserId={user.id}
-                userId={id}
-            />
+            <CommentSection userId={id} profileUser={profileUser} authUser={authUser} />
         </Box>
     );
 }

@@ -4,10 +4,18 @@ import { useAppDispatch } from '../hooks/redux-hooks';
 import { useNavigate } from 'react-router-dom';
 import { setUser } from '../store/slices/userSlice';
 import { get, getDatabase, ref } from 'firebase/database';
+import { useToast } from '@chakra-ui/react';
+
+export interface ServerError {
+    code: number;
+    message: string;
+    errors?: Array<{ message: string; domain: string; reason: string }>;
+}
 
 function Login() {
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
+    const toast = useToast();
 
     async function handleLoginSubmit(data: FormData) {
         const auth = getAuth();
@@ -42,8 +50,31 @@ function Login() {
             }
 
             navigate('/');
-        } catch (error) {
-            console.error('Login error:', error);
+        } catch (err: unknown) {
+            const serverError = err as ServerError;
+
+            if (serverError.message === 'Firebase: Error (auth/invalid-credential).') {
+                toast({
+                    title: 'Wrong email adress or password.',
+                    description: 'Try again.',
+                    status: 'error',
+                    duration: 4000,
+                    isClosable: false,
+                    position: 'top',
+                });
+            } else if (
+                serverError.message ===
+                'Firebase: Access to this account has been temporarily disabled due to many failed login attempts. You can immediately restore it by resetting your password or you can try again later. (auth/too-many-requests).'
+            ) {
+                toast({
+                    title: 'Too many requests.',
+                    description: 'Try again later.',
+                    status: 'error',
+                    duration: 4000,
+                    isClosable: false,
+                    position: 'top',
+                });
+            }
         }
     }
 

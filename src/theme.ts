@@ -1,8 +1,8 @@
 import { extendTheme, ThemeConfig } from '@chakra-ui/react';
 
 const config: ThemeConfig = {
-    initialColorMode: 'dark', // Встановлює темну тему як початкову
-    useSystemColorMode: false, // Вимикає використання системних налаштувань
+    initialColorMode: 'dark',
+    useSystemColorMode: false,
 };
 
 const theme = extendTheme({
@@ -40,6 +40,11 @@ const theme = extendTheme({
                         transition: 'background-color 5000s ease-in-out 0s',
                     },
                 },
+            },
+        },
+        Textarea: {
+            defaultProps: {
+                focusBorderColor: 'brand.200',
             },
         },
     },
